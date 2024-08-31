@@ -1,4 +1,5 @@
-const express = require('express');
+const express=require('express');
+const morgan=require('morgan');
 
 //res.send() method automatically sets the content type after inferring the request
 //automatically sets status code as well
@@ -8,6 +9,9 @@ const app = express();//create an instance of express
 
 // listen for requests
 app.listen(3000);
+
+//invoke morgan middleware
+app.use(morgan('dev')); //dev is for formatting
 
 // register view engine
 app.set('view engine', 'ejs');
