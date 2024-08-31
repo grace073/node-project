@@ -11,6 +11,8 @@ const app = express();//create an instance of express
 app.listen(3000);
 
 //invoke morgan middleware
+app.use(express.static('public'));//helps us use images or files in public folder
+
 app.use(morgan('dev')); //dev is for formatting
 
 // register view engine
