@@ -1,40 +1,41 @@
-const express=require('express');
-const morgan=require('morgan');
-
-//res.send() method automatically sets the content type after inferring the request
-//automatically sets status code as well
+const express = require('express');
+const morgan = require('morgan');
+const mongoose = require('mongoose');
+const blogRoutes = require('./routes/blogRoutes');
 
 // express app
-const app = express();//create an instance of express
+const app = express();
 
-// listen for requests
-app.listen(3000);
+// connect to mongodb & listen for requests
+const dbURI = 'mongodb+srv://Grace:ergrtbtrhrt1232345y@cluster0.4jq8n.mongodb.net/node1?retryWrites=true&w=majority&tls=true&appName=Cluster0';
 
-//invoke morgan middleware
-app.use(express.static('public'));//helps us use images or files in public folder
-
-app.use(morgan('dev')); //dev is for formatting
+mongoose.connect(dbURI)
+  .then(result => app.listen(3000))
+  .catch(err => console.log(err));
 
 // register view engine
 app.set('view engine', 'ejs');
-// app.set('views', 'myviews');
 
+// middleware & static files
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
+app.use((req, res, next) => {
+  res.locals.path = req.path;
+  next();
+});
+
+// routes
 app.get('/', (req, res) => {
-  const blogs = [
-    {title: 'Yoshi finds eggs', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-    {title: 'Mario finds stars', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-    {title: 'How to defeat bowser', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-  ];
-  res.render('index', { title: 'Home', blogs });
+  res.redirect('/blogs');
 });
 
 app.get('/about', (req, res) => {
   res.render('about', { title: 'About' });
 });
 
-app.get('/blogs/create', (req, res) => {
-  res.render('create', { title: 'Create a new blog' });
-});
+// blog routes
+app.use('/blogs', blogRoutes);
 
 // 404 page
 app.use((req, res) => {
